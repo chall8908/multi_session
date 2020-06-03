@@ -48,4 +48,10 @@ RSpec.describe 'multi_session', type: :request do
     domain_string = "domain=#{domain}"
     expect(aaaa_cookie_string).to include(domain_string)
   end
+
+  it 'Throws MissingSessionKey if attempting to set a key with no configuration' do
+    expect {
+      get '/encrypt_multi_sessions', params: {session_values: { not_present: 'in configuration' }}
+    }.to raise_exception MultiSession::MissingSessionKey
+  end
 end
