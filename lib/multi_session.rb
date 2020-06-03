@@ -18,4 +18,13 @@ module MultiSession
   def self.setup
     yield self
   end
+
+  class Error < StandardError
+  end
+
+  class MissingSessionKey < Error
+    def initialize(key)
+      super "No multi_session_keys entry found for #{key.inspect}"
+    end
+  end
 end

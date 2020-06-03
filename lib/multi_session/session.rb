@@ -61,7 +61,7 @@ module MultiSession
 
     def encryptor key
       secret_key_base = multi_session_keys[key.to_sym]
-      raise ArgumentError.new("Rails.application.credentials[:multi_session_keys][:'#{key}'] has not been set.") unless secret_key_base.present?
+      raise MissingSessionKey, key.to_sym unless secret_key_base.present?
 
       encrypted_cookie_cipher = 'aes-256-gcm'
       key_generator = ActiveSupport::CachingKeyGenerator.new ActiveSupport::KeyGenerator.new(secret_key_base, iterations: 1000)
