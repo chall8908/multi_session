@@ -1,4 +1,17 @@
 RSpec.describe 'multi_session', type: :request do
+  around do |example|
+    expires_was = MultiSession.expires
+    domain_was = MultiSession.domain
+
+    MultiSession.expires = nil
+    MultiSession.domain = nil
+
+    example.run
+
+    MultiSession.expires = expires_was
+    MultiSession.domain = domain_was
+  end
+
   it 'renders the root page without error' do
     get '/'
     expect(response.body).to include('<h1>hello world!</h1>')
@@ -26,26 +39,22 @@ RSpec.describe 'multi_session', type: :request do
   end
 
   it 'can set session cookies as expirable' do
-    expires = 2.days
-    MultiSession.setup do |config|
-      config.expires = expires
-    end
+    MultiSession.expires = 2.days
+
     get '/encrypt_multi_sessions', params: {session_values: {aaaa: 'alpha'}}
 
     aaaa_cookie_string = response.headers['Set-Cookie'].split("\n").select{|str| str.include?('aaaa=')}.first
-    expire_string = "expires=#{(Time.zone.now + expires).strftime('%a, %d %b %Y %H')}"
+    expire_string = "expires=#{(Time.zone.now + MultiSession.expires).strftime('%a, %d %b %Y %H')}"
 
     expect(aaaa_cookie_string).to include(expire_string)
   end
 
   it 'can set the domain of session cookies' do
-    domain = '.somedomain.com'
-    MultiSession.setup do |config|
-      config.domain = domain
-    end
+    MultiSession.domain = '.somedomain.com'
+
     get '/encrypt_multi_sessions', params: { session_values: { aaaa: 'alpha' }}
     aaaa_cookie_string = response.headers['Set-Cookie'].split("\n").select{ |str| str.include?('aaaa=')}.first
-    domain_string = "domain=#{domain}"
+    domain_string = "domain=#{MultiSession. domain}"
     expect(aaaa_cookie_string).to include(domain_string)
   end
 

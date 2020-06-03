@@ -25,5 +25,9 @@ module Dummy
     # Application configuration can go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded after loading
     # the framework and any gems in your application.
+
+    config.multi_session.expires = 1.hour
+
+    config.multi_session.domain = 'dummy.app'
   end
 end
