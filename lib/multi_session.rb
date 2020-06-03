@@ -22,6 +22,13 @@ module MultiSession
   class Error < StandardError
   end
 
+  class NoSessionKeys < Error
+    def initialize
+      super "Unable to find multi_session_keys." \
+        "Check your configuration and ensure that `multi_session_keys' is present."
+    end
+  end
+
   class MissingSessionKey < Error
     def initialize(key)
       super "No multi_session_keys entry found for #{key.inspect}"

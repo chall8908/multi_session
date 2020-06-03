@@ -48,15 +48,20 @@ module MultiSession
     private
 
     def multi_session_keys
-      keys = case MultiSession.credentials_strategy.to_sym
-      when :creds
-        Rails.configuration.creds.multi_session_keys!
-      when :secrets
-        Rails.application.secrets[:multi_session_keys]
-      else
-        Rails.application.credentials[:multi_session_keys]
-      end
-      keys.symbolize_keys
+      @keys ||= begin
+                  keys = case MultiSession.credentials_strategy.to_sym
+                         when :creds
+                           Rails.configuration.creds.multi_session_keys
+                         when :secrets
+                           Rails.application.secrets[:multi_session_keys]
+                         else
+                           Rails.application.credentials[:multi_session_keys]
+                         end
+
+                  raise NoSessionKeys.new if keys.nil?
+
+                  keys.symbolize_keys
+                end
     end
 
     def encryptor key
