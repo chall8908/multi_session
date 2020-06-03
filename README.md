@@ -75,7 +75,34 @@ For the current version `multi_session`, there these are the configuration value
 | `credentials_strategy`                | String/Symbol           | Strategy for managing credentials.                    |
 
 
-To configure `multi_session`, first generate an initializer using the built-in rails generator:
+`multi_session` can be configured using Rails configuration in your environment/application.rb files:
+
+```ruby
+Rails.application.configure do
+  # Force multi_session cookies to expire after a period of time
+  config.multi_session.expires = 30.minutes
+
+  # Change the domain of the multi_session cookies
+  config.multi_session.domain = nil
+
+  # Salt used to derive key for GCM encryption. Default value is 'multi session authenticated encrypted cookie'
+  config.multi_session.authenticated_encrypted_cookie_salt = 'my multi session salt value'
+
+  # Specify the strategy by which you are managing credentials in your application.
+  # MultiSession will attempt to locate your keys and automatically configure this
+  # option.
+  #
+  # Must be one of:
+  #
+  # 'credentials' (default) - uses Rails encrypted credentials stored in credentials.yml.enc via Rails.application.credentials
+  # 'secrets' - uses Rails secrets specified in secrets.yml via Rails.application.secrets
+  # 'creds' - uses the [Creds](https://github.com/freeletics/creds) gem via Rails.configuration.creds
+  config.multi_session.credentials_strategy = 'credentials'
+end
+```
+
+
+Alternatively, you can configure `multi_session` using an initializer.  The default initializer can be generated using:
 
 ```
 rails g multi_session:install
@@ -87,21 +114,11 @@ Then open and edit `config/initializers/multi_session.rb`:
 # config/initializers/multi_session.rb
 
 MultiSession.setup do |config|
-  # Uncomment to force multi_session cookies to expire after a period of time
+  # Options here match those in Rails configuration
+
   config.expires = 30.minutes
 
-  # Uncomment to change the domain of the multi_session cookies
-  # config.domain = nil
-
-  # Salt used to derive key for GCM encryption. Default value is 'multi session authenticated encrypted cookie'
-  config.authenticated_encrypted_cookie_salt = 'my multi session salt value'
-
-  # Specify the strategy by which you are managing credentials in your application
-  # Defaults to :credentials or :secrets depending on what your application is using
-  # 'credentials' (default) - uses Rails encrypted credentials stored in credentials.yml.enc via Rails.application.credentials
-  # 'secrets' - uses Rails secrets specified in secrets.yml via Rails.application.secrets
-  # 'creds' - uses the [Creds](https://github.com/freeletics/creds) gem via Rails.configuration.creds
-  config.credentials_strategy = 'credentials'
+  # ...
 end
 ```
 
